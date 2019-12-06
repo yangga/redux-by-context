@@ -24,11 +24,10 @@ You should understand what 'redux' is...
 #### `reduxSample/types.js`
 
 ```javascript
-const types = {
+export default {
   SET_DATA: "SET_DATA",
   ...
-};
-export default types
+}
 ```
 
 #### `reduxSample/actions.js`
@@ -36,7 +35,7 @@ export default types
 ```javascript
 import types from "./types";
 
-export default const useActions = (state, dispatch) => {
+export default useActions = (state, dispatch) => {
   const actions = {};
 
   // declare actions what you want to do
