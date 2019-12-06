@@ -1,0 +1,23 @@
+{
+  "name": "redux-by-context",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yangga/redux-by-context.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yangga/redux-by-context/issues"
+  },
+  "homepage": "https://github.com/yangga/redux-by-context#readme",
+  "peerDependencies": {
+    "react": ">= 16.3"
+  }
+}
