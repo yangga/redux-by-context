@@ -19,5 +19,8 @@
   "homepage": "https://github.com/yangga/redux-by-context#readme",
   "peerDependencies": {
     "react": ">= 16.3"
+  },
+  "devDependencies": {
+    "react": ">= 16.3"
   }
 }
