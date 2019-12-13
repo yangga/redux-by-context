@@ -1,21 +1,24 @@
 import React from "react";
-export declare type R = React.Reducer<any, any>;
-export declare type State = React.ReducerState<R>;
-export declare type Dispatch = React.Dispatch<React.ReducerAction<R>>;
-export interface IInitialization {
-    contextName: string;
-    actionCreator: (state: React.ReducerState<R>, dispatch: React.Dispatch<React.ReducerAction<R>>) => any;
-    initialState: React.ReducerState<R>;
-    reducer: R;
+interface ReducerAction<ActionTypes> {
+    type: ActionTypes;
+    data: any;
+}
+export declare type DefaultReducerAction = ReducerAction<string>;
+declare type Reducer<State, ActionTypes> = (prevState: State, action: ReducerAction<ActionTypes>) => State;
+export declare type Dispatch<ActionTypes> = React.Dispatch<ReducerAction<ActionTypes>>;
+export declare type DefaultDispatch = Dispatch<string>;
+declare type ActionCreator<State, ActionTypes, ActionPool> = (state: State, dispatch: Dispatch<ActionTypes>) => ActionPool;
+interface InitParam<State, ActionPool, ActionTypes> {
+    actionCreator: ActionCreator<State, ActionTypes, ActionPool>;
+    initialState: State;
+    reducer: Reducer<State, ActionTypes>;
     traceState?: boolean;
 }
-interface IParamProvide {
-    children: any;
+interface ParamProvide {
+    children: React.ReactNode;
 }
-declare function initialize(param: IInitialization): {
-    Context: React.Context<any>;
-    Provider: (renderParam: IParamProvide) => JSX.Element;
-    Consumer: React.Consumer<any>;
-    useConsumer: (ConsumableComponent: React.ComponentType<{}>) => (props: any) => JSX.Element;
+export default function initialize<State, ActionPool, ActionTypes = string>(param: InitParam<State, ActionPool, ActionTypes>): {
+    Provider: (renderParam: ParamProvide) => JSX.Element;
+    useRedux: () => [State, ActionPool];
 };
-export default initialize;
+export {};

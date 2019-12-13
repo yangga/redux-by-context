@@ -1,28 +1,42 @@
-import React, { createContext, useEffect, useReducer } from "react";
+import React, { createContext, useContext, useEffect, useReducer } from "react";
 
-export type R = React.Reducer<any, any>;
-export type State = React.ReducerState<R>;
-export type Dispatch = React.Dispatch<React.ReducerAction<R>>;
+interface ReducerAction<ActionTypes> {
+  type: ActionTypes;
+  data: any;
+}
+export type DefaultReducerAction = ReducerAction<string>;
 
-export interface IInitialization {
-  contextName: string;
-  actionCreator: (
-    state: React.ReducerState<R>,
-    dispatch: React.Dispatch<React.ReducerAction<R>>
-  ) => any;
-  initialState: React.ReducerState<R>;
-  reducer: R;
+type Reducer<State, ActionTypes> = (
+  prevState: State,
+  action: ReducerAction<ActionTypes>
+) => State;
+
+export type Dispatch<ActionTypes> = React.Dispatch<ReducerAction<ActionTypes>>;
+export type DefaultDispatch = Dispatch<string>;
+
+type ActionCreator<State, ActionTypes, ActionPool> = (
+  state: State,
+  dispatch: Dispatch<ActionTypes>
+) => ActionPool;
+
+interface InitParam<State, ActionPool, ActionTypes> {
+  actionCreator: ActionCreator<State, ActionTypes, ActionPool>;
+  initialState: State;
+  reducer: Reducer<State, ActionTypes>;
   traceState?: boolean;
 }
 
-interface IParamProvide {
-  children: any;
+interface ParamProvide {
+  children: React.ReactNode;
 }
 
-function initialize(param: IInitialization) {
-  const Context = createContext(param.initialState);
+export default function initialize<State, ActionPool, ActionTypes = string>(
+  param: InitParam<State, ActionPool, ActionTypes>
+) {
+  const temp: any = null;
+  const Context = createContext(temp);
 
-  const Provider = (renderParam: IParamProvide) => {
+  const Provider = (renderParam: ParamProvide) => {
     const [state, dispatch] = useReducer(param.reducer, param.initialState);
 
     const actions = param.actionCreator(state, dispatch);
@@ -32,32 +46,19 @@ function initialize(param: IInitialization) {
     }
 
     return (
-      <Context.Provider value={{ state, dispatch, actions }}>
+      <Context.Provider value={[state, actions]}>
         {renderParam.children}
       </Context.Provider>
     );
   };
 
-  const Consumer = Context.Consumer;
-  const useConsumer = (ConsumableComponent: React.ComponentType) => (
-    props: any
-  ) => (
-    <Consumer>
-      {({ state, dispatch, actions }) => (
-        <ConsumableComponent
-          {...{ [param.contextName]: { state, dispatch, actions } }}
-          {...props}
-        />
-      )}
-    </Consumer>
-  );
+  function useRedux(): [State, ActionPool] {
+    const [state, actions] = useContext(Context);
+    return [state, actions];
+  }
 
   return {
-    Context,
     Provider,
-    Consumer,
-    useConsumer
+    useRedux
   };
 }
-
-export default initialize;

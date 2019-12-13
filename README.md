@@ -21,62 +21,38 @@ You should understand what 'redux' is...
                - index.js
 ```
 
-#### `reduxSample/types.js`
+#### `reduxSample/types.ts`
 
 ```javascript
-export default {
-  SET_DATA: "SET_DATA",
-  ...
+export const SET_DATA = "SET_DATA";
+...
+```
+
+#### `reduxSample/reducer.ts`
+
+```javascript
+import { DefaultReducerAction } from "redux-by-context";
+import * as types from "./types";
+
+export class State {
+  list: Array<number> = [];
 }
-```
-
-#### `reduxSample/actions.js`
-
-```javascript
-import types from "./types";
-
-export default useActions = (state, dispatch) => {
-  const actions = {};
-
-  // declare actions what you want to do
-  actions.fetchSomething = async (param1, param2) => {
-    try {
-      const res = await fetch("https://...");
-      const resJson = await res.json();
-      return dispatch({
-        type: types.SET_DATA,
-        data: resJson
-      });
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  return actions;
-};
-```
-
-#### `reduxSample/reducer.js`
-
-```javascript
-import types from "./types";
 
 // the state at the beginning
-const initialState = {
-  data: []
-};
+const initialState = new State();
 
 // add codes here for changing state
-const reducer = (state = initialState, action) => {
+const reducer = (prevState = initialState, action: DefaultReducerAction) => {
   switch (action.type) {
-    case types.SET_DATA: {
-      const { data } = action;
-      return {
-        ...state,
-        data
-      };
-    }
+    case types.SET_DATA:
+      const {
+        data: { list }
+      } = action;
 
+      return {
+        ...prevState,
+        list
+      };
     default:
       throw new Error("Unexpected action");
   }
@@ -85,75 +61,90 @@ const reducer = (state = initialState, action) => {
 export { initialState, reducer };
 ```
 
-#### `reduxSample/index.js`
+#### `reduxSample/actions.ts`
 
 ```javascript
-import RBC from "redux-by-context";
+import { DefaultDispatch } from "redux-by-context";
+import { State } from "./reducer";
+import * as types from "./types";
 
+export interface Actions {
+  fetch: (param: any) => Promise<any>;
+}
+
+export function actionCreator(state: State, dispatch: DefaultDispatch) {
+  class ActionImpl implements Actions {
+    async fetch(param?: any) {
+      try {
+        // do something...
+
+        return dispatch({
+          type: types.SET_DATA,
+          data: {
+            list: [1, 2, 3, 4, 5]
+          }
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }
+  const ins = new ActionImpl();
+  return ins;
+}
+```
+
+#### `reduxSample/index.ts`
+
+```javascript
+import reduxInitialize from "redux-by-context";
+
+import { actionCreator } from "./actions";
 import { initialState, reducer } from "./reducer";
-import useActions from "./actions";
 
-const {
-  Context: SampleContext,
-  Provider: SampleProvider,
-  useConsumer: SampleConsumer
-} = RBC({
-  contextName: "ctxSample", // You can change the name of context
-  actionCreator: useActions,
+export const { Provider, useRedux } = reduxInitialize({
+  actionCreator: actionCreator,
   reducer,
   initialState,
   traceState: false
 });
-
-export { SampleContext, SampleProvider, SampleConsumer };
 ```
 
 ### 2. Let's use your redux codes
 
-#### `App.js`
+#### `App.tsx`
 
 ```javascript
-import { SampleProvider } from './reduxSample'
-import Child from "./child"
+import { Provider } from "./reduxSample";
+import Child from "./child";
 
-export default class App extends React.Component {
-    ...
-
-    render() {
-        return (
-            <>
-                <SampleProvider>
-                    <!-- Your child components here !-->
-                    <Child />
-                </SampleProvider>
-            </>
-        )
-    }
+export default function App() {
+  return (
+    <>
+      <Provider>
+        <Child />
+      </Provider>
+    </>
+  );
 }
 ```
 
-#### `Child.js`
+#### `Child.tsx`
 
 ```javascript
-import { SampleConsumer } from "./reduxSample";
+import { useRedux } from "./reduxSample";
 
-class Child extends React.Component {
+export default (props: any) => {
+  const [flowState, flowAction] = useRedux();
+
+  console.log("flowState", flowState);
+
+  useEffect(() => {
+    flowAction.fetch().then(() => {});
+  }, []);
+
+  return (
     ...
-
-    async componentDidMount() {
-        await this.props.ctxSample.actions.fetchSomething('abc', 'def')
-        ...
-    }
-
-    render() {
-        const {
-            data
-        } = this.props.ctxSample.state
-
-        ...
-    }
+  )
 }
-
-const ConsumedClass = SampleConsumer(Child)
-export default ConsumedClass;
 ```
