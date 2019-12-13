@@ -15,10 +15,14 @@ export interface IInitialization {
   ) => any;
 }
 
+interface IParamProvide {
+  children: any;
+}
+
 function initialize(param: IInitialization) {
   const Context = createContext(param.initialState);
 
-  const Provider = ({ children }) => {
+  const Provider = (renderParam: IParamProvide) => {
     const [state, dispatch] = useReducer(param.reducer, param.initialState);
 
     const actions = param.actionCreator(state, dispatch);
@@ -29,7 +33,7 @@ function initialize(param: IInitialization) {
 
     return (
       <Context.Provider value={{ state, dispatch, actions }}>
-        {children}
+        {renderParam.children}
       </Context.Provider>
     );
   };
