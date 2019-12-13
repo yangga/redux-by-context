@@ -12,7 +12,7 @@ function initialize(param) {
         return (react_1.default.createElement(Context.Provider, { value: { state, dispatch, actions } }, renderParam.children));
     };
     const Consumer = Context.Consumer;
-    const useConsumer = (WrappedComponent) => (props) => (react_1.default.createElement(Consumer, null, ({ state, dispatch, actions }) => (react_1.default.createElement(WrappedComponent, Object.assign({}, { [param.contextName]: { state, dispatch, actions } }, props)))));
+    const useConsumer = (ConsumableComponent) => (props) => (react_1.default.createElement(Consumer, null, ({ state, dispatch, actions }) => (react_1.default.createElement(ConsumableComponent, Object.assign({}, { [param.contextName]: { state, dispatch, actions } }, props)))));
     return {
         Context,
         Provider,

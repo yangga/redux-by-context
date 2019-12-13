@@ -6,13 +6,13 @@ export type Dispatch = React.Dispatch<React.ReducerAction<R>>;
 
 export interface IInitialization {
   contextName: string;
-  reducer: R;
-  initialState: React.ReducerState<R>;
-  traceState: boolean;
   actionCreator: (
     state: React.ReducerState<R>,
     dispatch: React.Dispatch<React.ReducerAction<R>>
   ) => any;
+  initialState: React.ReducerState<R>;
+  reducer: R;
+  traceState?: boolean;
 }
 
 interface IParamProvide {
@@ -39,12 +39,12 @@ function initialize(param: IInitialization) {
   };
 
   const Consumer = Context.Consumer;
-  const useConsumer = (WrappedComponent: React.ComponentType) => (
+  const useConsumer = (ConsumableComponent: React.ComponentType) => (
     props: any
   ) => (
     <Consumer>
       {({ state, dispatch, actions }) => (
-        <WrappedComponent
+        <ConsumableComponent
           {...{ [param.contextName]: { state, dispatch, actions } }}
           {...props}
         />
