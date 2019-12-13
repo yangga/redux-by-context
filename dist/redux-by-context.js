@@ -1,19 +1,17 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const react_1 = require("react");
-function initialize(param) {
+import React, { createContext, useContext, useEffect, useReducer } from "react";
+export default function initialize(param) {
     const temp = null;
-    const Context = react_1.createContext(temp);
+    const Context = createContext(temp);
     const Provider = (renderParam) => {
-        const [state, dispatch] = react_1.useReducer(param.reducer, param.initialState);
+        const [state, dispatch] = useReducer(param.reducer, param.initialState);
         const actions = param.actionCreator(state, dispatch);
         if (param.traceState) {
-            react_1.useEffect(() => console.log({ newState: state }), [state]);
+            useEffect(() => console.log({ newState: state }), [state]);
         }
-        return (react_1.default.createElement(Context.Provider, { value: [state, actions] }, renderParam.children));
+        return (React.createElement(Context.Provider, { value: [state, actions] }, renderParam.children));
     };
     function useRedux() {
-        const [state, actions] = react_1.useContext(Context);
+        const [state, actions] = useContext(Context);
         return [state, actions];
     }
     return {
@@ -21,4 +19,3 @@ function initialize(param) {
         useRedux
     };
 }
-exports.default = initialize;

@@ -2,10 +2,11 @@
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "jsx": "react",
-    "target": "ES2016",
-    "module": "commonjs",
+    "target": "ES2015",
+    "module": "ES2015",
     "declaration": true,
     "outDir": "./dist",
-    "strict": true
+    "strict": true,
+    "moduleResolution": "Node"
   }
 }
